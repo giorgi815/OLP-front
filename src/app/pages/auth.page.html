@@ -1,0 +1,114 @@
+<div class="auth-wrap">
+  <section class="auth-left">
+    <div class="auth-left-inner">
+      <span class="eyebrow eyebrow-light">
+        WELCOME TO OPENLEARN
+      </span>
+      <h1>
+        Small steps.
+        <br>
+        Big discoveries.
+      </h1>
+      <p>
+        Every expert was once a beginner. Find your community, master new skills, and turn possibility into progress.
+      </p>
+      <p style="margin-top:34px;font-size:12px">
+        ✦ &nbsp; Created for learners and educators.
+      </p>
+    </div>
+  </section>
+  <section class="auth-right">
+    <div class="auth-form">
+      <span class="eyebrow">
+        {{registerMode()?'JOIN OUR COMMUNITY':'WELCOME BACK'}}
+      </span>
+      <h2 style="margin-top:12px">
+        {{registerMode()?'Create your account':'Good to see you again.'}}
+      </h2>
+      <p>
+        {{registerMode()?'Start your journey with a few quick details.':'Pick up where you left off. Your next lesson is waiting.'}}
+      </p>
+      @if(registerMode()){
+      <div class="radio-row">
+        <button class="radio-choice" type="button" [class.selected]="role==='student'" (click)="role='student'">
+          ◈ &nbsp; I'm a student
+        </button>
+        <button class="radio-choice" type="button" [class.selected]="role==='teacher'" (click)="role='teacher'">
+          ✎ &nbsp; I'm a teacher
+        </button>
+      </div>
+      }
+      <form (ngSubmit)="submit()" #form="ngForm">
+        @if(registerMode()){
+        <div class="form-row">
+          <div class="field">
+            <label for="first">
+              First name
+            </label>
+            <input id="first" name="firstName" [(ngModel)]="firstName" required autocomplete="given-name" />
+          </div>
+          <div class="field">
+            <label for="last">
+              Last name
+            </label>
+            <input id="last" name="lastName" [(ngModel)]="lastName" required autocomplete="family-name"/>
+          </div>
+        </div>
+        }
+        <div class="field">
+          <label for="email">
+            Email address
+          </label>
+          <input id="email" type="email" name="email" [(ngModel)]="email" required email autocomplete="email" placeholder="you@example.com" />
+        </div>
+        <div class="field">
+          <label for="password">
+            Password
+          </label>
+          <input id="password" type="password" name="password" [(ngModel)]="password" required minlength="8" [autocomplete]="registerMode()?'new-password':'current-password'" placeholder="At least 8 characters"/>
+        </div>
+        @if(registerMode()){
+        <div class="field">
+          <label for="confirm">
+            Confirm password
+          </label>
+          <input id="confirm" type="password" name="confirmPassword" [(ngModel)]="confirmPassword" required autocomplete="new-password"/>
+        </div>
+        }
+        @if(!registerMode()){
+        <p class="right space-bottom">
+          <a class="text-action" routerLink="/forgot-password">
+            Forgot password?
+          </a>
+        </p>
+        }
+        @if(error()){
+        <div class="message error" role="alert">
+          {{error()}}
+        </div>
+        }
+        @if(success()){
+        <div class="message success" role="status">
+          {{success()}}
+        </div>
+        }
+        <button class="btn btn-full" type="submit" [disabled]="busy() || form.invalid">
+          {{busy()?'Please wait…':(registerMode()?'Create account ↗':'Log in →')}}
+        </button>
+      </form>
+      <p style="text-align:center;margin-top:23px">
+        {{registerMode()?'Already have an account?':'New to OLP?'}}
+        <a class="text-action" [routerLink]="registerMode()?'/login':'/register'">
+          {{registerMode()?'Log in':'Create an account'}}
+        </a>
+      </p>
+      @if(registerMode() && success()){
+      <div style="text-align:center;margin-top:10px">
+        <a class="text-action" routerLink="/login">
+          Go to login →
+        </a>
+      </div>
+      }
+    </div>
+  </section>
+</div>

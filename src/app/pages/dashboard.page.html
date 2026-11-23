@@ -1,0 +1,248 @@
+<div class="page-head">
+  <div class="container">
+    <div class="eyebrow">
+      YOUR SPACE
+    </div>
+    <h1>
+      Welcome back{{auth.profile()?', '+auth.profile()!.firstName:''}} ✳
+    </h1>
+    <p>
+      Here's where your learning journey continues.
+    </p>
+  </div>
+</div>
+<div class="container dashboard-layout">
+  <app-side-nav/>
+  <div class="dashboard-main">
+    @if(error()){
+    <div class="message error">
+      {{error()}}
+    </div>
+    }
+    @if(auth.isStudent()){
+    <div class="section-head">
+      <div>
+        <h2>
+          Your learning, in progress
+        </h2>
+        <p>
+          Everything you need to pick up where you left off.
+        </p>
+      </div>
+      <a routerLink="/courses" class="btn btn-small">
+        Find a course ↗
+      </a>
+    </div>
+    <div class="grid grid-3 space-bottom">
+      <div class="stat-card">
+        <div class="stat-icon">
+          ◈
+        </div>
+        <strong>
+          {{enrollments().length}}
+        </strong>
+        <span>
+          Courses enrolled
+        </span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          ✎
+        </div>
+        <strong>
+          {{submissionsCount()}}
+        </strong>
+        <span>
+          Assignments submitted
+        </span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          ✦
+        </div>
+        <strong>
+          {{unread()}}
+        </strong>
+        <span>
+          Unread notifications
+        </span>
+      </div>
+    </div>
+    <h3 class="space-bottom">
+      My courses
+    </h3>
+    @if(enrollments().length){
+    <div class="list">
+      @for(e of enrollments();track e.id){
+      <a class="list-row" [routerLink]="['/learning',e.courseId]">
+        <div class="mini-art">
+          ◈
+        </div>
+        <div class="grow">
+          <strong>
+            {{e.courseTitle}}
+          </strong>
+          <p>
+            Joined {{date(e.enrolledAt)}}
+          </p>
+        </div>
+        <span class="btn btn-light btn-small">
+          Continue →
+        </span>
+      </a>
+      }
+    </div>
+    }
+    @else{
+    <div class="empty">
+      <div class="empty-illustration">
+        ✧
+      </div>
+      <h3>
+        Your journey starts here
+      </h3>
+      <p>
+        Enroll in a course and your lessons will appear on this dashboard.
+      </p>
+      <a class="btn btn-small" routerLink="/courses">
+        Explore courses
+      </a>
+    </div>
+    }
+    }
+    @if(auth.isTeacher()){
+    <div class="section-head">
+      <div>
+        <h2>
+          Your teaching studio
+        </h2>
+        <p>
+          Create lessons, publish courses, and support your students.
+        </p>
+      </div>
+      <a class="btn btn-small" routerLink="/teach">
+        Open studio ↗
+      </a>
+    </div>
+    <div class="grid grid-3 space-bottom">
+      <div class="stat-card">
+        <div class="stat-icon">
+          ▤
+        </div>
+        <strong>
+          {{teacherCourses().length}}
+        </strong>
+        <span>
+          Your courses
+        </span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          ✦
+        </div>
+        <strong>
+          {{publishedCount()}}
+        </strong>
+        <span>
+          Published courses
+        </span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          ♧
+        </div>
+        <strong>
+          {{unread()}}
+        </strong>
+        <span>
+          Unread notifications
+        </span>
+      </div>
+    </div>
+    <div class="list">
+      @for(course of teacherCourses();track course.id){
+      <a class="list-row" [routerLink]="['/teach/courses',course.id]">
+        <div class="mini-art">
+          ✎
+        </div>
+        <div class="grow">
+          <strong>
+            {{course.title}}
+          </strong>
+          <p>
+            {{course.status===2?'Published':'Draft'}} · {{course.categoryName}}
+          </p>
+        </div>
+        <span class="text-action">
+          Manage →
+        </span>
+      </a>
+      }
+    </div>
+    }
+    @if(auth.isAdmin()){
+    <div class="section-head">
+      <div>
+        <h2>
+          Platform overview
+        </h2>
+        <p>
+          A snapshot of your growing learning community.
+        </p>
+      </div>
+      <a class="btn btn-small" routerLink="/admin">
+        Manage platform ↗
+      </a>
+    </div>
+    <div class="grid grid-4 space-bottom">
+      <div class="stat-card">
+        <div class="stat-icon">
+          ♙
+        </div>
+        <strong>
+          {{stats()?.users??'—'}}
+        </strong>
+        <span>
+          Users
+        </span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          ▤
+        </div>
+        <strong>
+          {{stats()?.courses??'—'}}
+        </strong>
+        <span>
+          Courses
+        </span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          ◈
+        </div>
+        <strong>
+          {{stats()?.enrollments??'—'}}
+        </strong>
+        <span>
+          Enrollments
+        </span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          ✎
+        </div>
+        <strong>
+          {{stats()?.submissions??'—'}}
+        </strong>
+        <span>
+          Submissions
+        </span>
+      </div>
+    </div>
+    <div class="subtle">
+      Visit the admin workspace to manage categories, review user profiles, and grant teacher roles.
+    </div>
+    }
+  </div>
+</div>

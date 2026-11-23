@@ -1,0 +1,88 @@
+<div class="certificate-toolbar container">
+  <a routerLink="/dashboard" class="back-link">
+    ← Dashboard
+  </a>
+  <button class="btn btn-small" (click)="print()" [disabled]="!certificate()">
+    Print certificate ↗
+  </button>
+</div>
+@if(error()){
+<div class="container message error">
+  {{error()}}
+</div>
+}
+@if(certificate();as record){
+<div class="certificate-sheet">
+  <div class="certificate-inner">
+    <div class="cert-top">
+      <div class="brand">
+        <span class="brand-mark">
+          o
+          <span>
+            ✳
+          </span>
+        </span>
+        <span>
+          open
+          <span class="brand-soft">
+            learn
+          </span>
+        </span>
+      </div>
+      <div class="eyebrow">
+        OFFICIAL COURSE ACHIEVEMENT
+      </div>
+    </div>
+    <div class="cert-symbol">
+      ✳
+    </div>
+    <div class="eyebrow">
+      CERTIFICATE OF COMPLETION
+    </div>
+    <h1>
+      Knowledge looks
+      <br>
+      good on you.
+    </h1>
+    <p>
+      This certificate is proudly presented to
+    </p>
+    <h2>
+      {{record.studentName}}
+    </h2>
+    <p>
+      for successfully completing the course
+    </p>
+    <h3>
+      {{record.courseTitle}}
+    </h3>
+    <div class="cert-footer">
+      <div>
+        <span class="small muted">
+          AWARDED ON
+        </span>
+        <strong>
+          {{dateLabel(record.issuedAt)}}
+        </strong>
+      </div>
+      <div>
+        <span class="small muted">
+          CERTIFICATE ID
+        </span>
+        <strong class="small">
+          {{record.id}}
+        </strong>
+      </div>
+      <div class="cert-seal">
+        ✓
+      </div>
+    </div>
+  </div>
+</div>
+}
+@else if(!error()){
+<div class="container section">
+  <div class="skeleton">
+  </div>
+</div>
+}

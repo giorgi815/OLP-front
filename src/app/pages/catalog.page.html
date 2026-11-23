@@ -1,0 +1,81 @@
+<div class="page-head">
+  <div class="container">
+    <div class="eyebrow">
+      EXPLORE & DISCOVER
+    </div>
+    <h1>
+      Find what inspires you.
+    </h1>
+    <p>
+      Explore courses made for curious minds and everyday growth.
+    </p>
+  </div>
+</div>
+<section class="section">
+  <div class="container">
+    <div class="action-bar">
+      <div style="flex:1;max-width:500px">
+        <input class="search-input" [(ngModel)]="search" placeholder="⌕  Search courses, teachers, topics..." aria-label="Search courses" />
+      </div>
+      <select class="search-input" style="max-width:225px" [(ngModel)]="category">
+        <option value="">
+          All categories
+        </option>
+        @for(item of categories();track item.id){
+        <option [value]="item.id">
+          {{item.name}}
+        </option>
+        }
+      </select>
+    </div>
+    <div class="section-head" style="margin-top:30px">
+      <h3>
+        All courses
+        <span class="badge-count">
+          {{filtered().length}}
+        </span>
+      </h3>
+      <span class="muted small">
+        Discover something worth learning
+      </span>
+    </div>
+    @if(error()){
+    <div class="message error">
+      {{error()}}
+    </div>
+    }
+    @if(loading()) {
+    <div class="grid grid-3">
+      <div class="skeleton">
+      </div>
+      <div class="skeleton">
+      </div>
+      <div class="skeleton">
+      </div>
+    </div>
+    }
+    @else if(filtered().length){
+    <div class="grid grid-3">
+      @for(course of filtered();track course.id;let i=$index){
+      <app-course-card [course]="course" [index]="i"/>
+      }
+    </div>
+    }
+    @else{
+    <div class="empty">
+      <div class="empty-illustration">
+        ⌕
+      </div>
+      <h3>
+        No courses found
+      </h3>
+      <p>
+        Try a different keyword or category.
+      </p>
+      <button class="btn btn-small" (click)="search='';category=''">
+        Clear filters
+      </button>
+    </div>
+    }
+  </div>
+</section>

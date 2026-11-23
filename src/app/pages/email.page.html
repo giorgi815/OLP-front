@@ -1,0 +1,53 @@
+<div class="container" style="max-width:540px;padding:80px 0 100px">
+  <div class="panel panel-pad" style="padding:35px">
+    <div class="eyebrow">
+      ACCOUNT SECURITY
+    </div>
+    <h2 style="margin:12px 0">
+      {{mode==='confirm-email'?'Verify your email':mode==='reset-password'?'Set a new password':'Reset your password'}}
+    </h2>
+    <p class="lead" style="font-size:13px">
+      {{mode==='confirm-email'?'Confirm your address to activate your OLP account.':mode==='reset-password'?'Choose a strong new password for your account.':'We will send you a password reset link if your account exists.'}}
+    </p>
+    <form (ngSubmit)="submit()" #form="ngForm">
+      @if(mode==='forgot-password'){
+      <div class="field">
+        <label>
+          Email
+        </label>
+        <input name="email" type="email" [(ngModel)]="email" required email />
+      </div>
+      }
+      @if(mode==='reset-password'){
+      <div class="field">
+        <label>
+          New password
+        </label>
+        <input name="newPassword" type="password" [(ngModel)]="password" required minlength="8" />
+      </div>
+      <div class="field">
+        <label>
+          Confirm new password
+        </label>
+        <input name="confirmNewPassword" type="password" [(ngModel)]="confirmPassword" required minlength="8" />
+      </div>
+      }
+      @if(error()){
+      <div class="message error">
+        {{error()}}
+      </div>
+      }
+      @if(success()){
+      <div class="message success">
+        {{success()}}
+      </div>
+      }
+      <button class="btn btn-full" type="submit" [disabled]="busy()||form.invalid">
+        {{busy()?'Please wait…':mode==='confirm-email'?'Confirm email':'Continue'}}
+      </button>
+    </form>
+    <a routerLink="/login" class="text-action" style="margin-top:20px">
+      ← Back to login
+    </a>
+  </div>
+</div>

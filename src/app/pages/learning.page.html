@@ -1,0 +1,215 @@
+<div class="page-head">
+  <div class="container">
+    <a routerLink="/dashboard" class="back-link">
+      ← My dashboard
+    </a>
+    <div class="eyebrow" style="margin-top:20px">
+      MY CLASSROOM
+    </div>
+    <h1>
+      {{course()?.title || 'Your course'}}
+    </h1>
+    <p>
+      {{course()?.teacherName}} · Keep your momentum going.
+    </p>
+  </div>
+</div>
+<div class="container section">
+  <div class="split">
+    <div>
+      @if(error()){
+      <div class="message error">
+        {{error()}}
+      </div>
+      }
+      <div class="panel panel-pad space-bottom">
+        <div class="section-head">
+          <div>
+            <h3>
+              Course progress
+            </h3>
+            <p>
+              The teacher marks lessons complete after checking your participation.
+            </p>
+          </div>
+          <strong>
+            {{percentage()}}%
+          </strong>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="percentage()">
+          </div>
+        </div>
+        <p class="small muted">
+          {{completeCount()}} of {{lessons().length}} lessons complete
+        </p>
+      </div>
+      <div class="panel panel-pad space-bottom">
+        <h3>
+          Lessons
+        </h3>
+        <div class="list space-top">
+          @for(lesson of lessons();track lesson.id;let i=$index){
+          <div class="list-row" style="align-items:flex-start">
+            <div class="mini-art" [style.background]="completed(lesson.id)?'#d6f4df':''">
+              {{completed(lesson.id)?'✓':i+1}}
+            </div>
+            <div class="grow">
+              <strong>
+                {{lesson.title}}
+              </strong>
+              <p>
+                {{completed(lesson.id)?'Completed by teacher':'Not yet marked complete'}}
+              </p>
+              <button class="link-button" (click)="selectedLesson.set(selectedLesson()===lesson.id?'':lesson.id)">
+                {{selectedLesson()===lesson.id?'Hide content':'View lesson ↗'}}
+              </button>
+              @if(selectedLesson()===lesson.id){
+              <div class="subtle space-top">
+                <div class="content-copy">
+                  {{lesson.content}}
+                </div>
+                @for(key of lesson.attachments;track key){
+                <button class="link-button" (click)="lessonDownload(lesson.id,key)">
+                  ↓ {{key.split('/').pop()}}
+                </button>
+                }
+              </div>
+              }
+            </div>
+          </div>
+          }@empty{
+          <p class="muted small">
+            Your teacher has not added lessons yet.
+          </p>
+          }
+        </div>
+      </div>
+      <div class="panel panel-pad">
+        <h3>
+          Assignments & grades
+        </h3>
+        <p class="muted small">
+          Submit your work and review teacher feedback.
+        </p>
+        <div class="list space-top">
+          @for(a of assignments();track a.id){
+          <div class="panel panel-pad" style="box-shadow:none">
+            <div class="action-bar">
+              <strong>
+                {{a.title}}
+              </strong>
+              <span class="tag tag-amber">
+                Due {{dateLabel(a.dueDate)}}
+              </span>
+            </div>
+            <p class="content-copy">
+              {{a.description}}
+            </p>
+            <p class="muted small">
+              Maximum score: {{a.maxScore}}
+            </p>
+            @if(submissionFor(a.id);as submitted){
+            <div class="subtle">
+              <strong>
+                Submitted ✓
+              </strong>
+              <span class="muted small">
+                {{dateLabel(submitted.submittedAt)}}
+              </span>
+              <p class="content-copy">
+                {{submitted.content}}
+              </p>
+              <div class="button-row">
+                <span [class]="submitted.score===null?'pill pending':'pill'">
+                  {{submitted.score===null?'Awaiting grade':'Score: '+submitted.score+' / '+a.maxScore}}
+                </span>
+              </div>
+              @if(submitted.feedback){
+              <p class="small">
+                Teacher feedback: {{submitted.feedback}}
+              </p>
+              }@for(key of submitted.attachments;track key){
+              <button class="link-button" (click)="submissionDownload(submitted.id,key)">
+                ↓ {{key.split('/').pop()}}
+              </button>
+              }
+            </div>
+            <div class="field space-top">
+              <label>
+                Upload a file to this submission
+              </label>
+              <input type="file" (change)="uploadSubmissionFile(submitted.id,$event)" />
+            </div>
+            }@else{
+            <form (ngSubmit)="submit(a.id)">
+              <div class="field">
+                <label>
+                  Your answer
+                </label>
+                <textarea name="answer-{{a.id}}" [(ngModel)]="answers[a.id]" required placeholder="Write your answer or describe the work you completed...">
+                </textarea>
+              </div>
+              <button class="btn btn-small" [disabled]="busy()||!answers[a.id]?.trim()">
+                Submit assignment →
+              </button>
+            </form>
+            }
+          </div>
+          }@empty{
+          <p class="muted small">
+            No assignments for this course yet.
+          </p>
+          }
+        </div>
+      </div>
+    </div>
+    <aside>
+      <div class="panel panel-pad" style="position:sticky;top:104px">
+        <div class="eyebrow">
+          ACHIEVEMENTS
+        </div>
+        <h3 style="margin:13px 0">
+          Your certificate
+        </h3>
+        <p class="muted small" style="line-height:1.8">
+          Once your teacher has completed all lesson checks, you can request your course certificate.
+        </p>
+        <div class="subtle">
+          <strong>
+            {{percentage()===100?'✦ Ready to claim':'◷ In progress'}}
+          </strong>
+          <p style="margin:6px 0">
+            {{percentage()===100?'Your learning milestone is here!':'Complete every lesson to unlock your certificate.'}}
+          </p>
+        </div>
+        <button class="btn btn-full space-top" (click)="issue()" [disabled]="percentage()<100||busy()">
+          Issue certificate ✦
+        </button>
+        @if(certificate()){
+        <hr class="divider"/>
+        <div class="eyebrow">
+          CERTIFICATE ISSUED
+        </div>
+        <h3 style="margin:12px 0">
+          {{certificate()!.courseTitle}}
+        </h3>
+        <p class="muted small">
+          Awarded to {{certificate()!.studentName}}
+        </p>
+        <p class="muted small">
+          {{dateLabel(certificate()!.issuedAt)}}
+        </p>
+        <a class="btn btn-outline btn-full" [routerLink]="['/certificates',certificate()!.id]">
+          View certificate ↗
+        </a>
+        }
+        @if(message()){
+        <div class="message" [class.error]="failed()" [class.success]="!failed()">
+          {{message()}}
+        </div>
+        }
+      </div>
+    </aside>
+  </div>
+</div>

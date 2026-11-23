@@ -1,0 +1,169 @@
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <span class="eyebrow">
+        ✳ &nbsp; A better way to grow
+      </span>
+      <h1>
+        Make room for
+        <em>
+          what's next.
+        </em>
+      </h1>
+      <p>
+        Learn new skills, explore new ideas, and build a future you're excited about. Your next big step starts right here.
+      </p>
+      <div class="button-row">
+        <a class="btn" routerLink="/courses">
+          Explore courses
+          <span>
+            ↗
+          </span>
+        </a>
+        <a class="btn btn-white" routerLink="/register">
+          Start learning →
+        </a>
+      </div>
+      <p style="font-size:12px;margin-top:26px;color:#769187">
+        ✦ Flexible learning &nbsp;&nbsp; ✦ Expert teachers &nbsp;&nbsp; ✦ At your pace
+      </p>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hero-frame">
+        <span class="hero-letter">
+          L
+        </span>
+      </div>
+      <div class="float-card float-top">
+        ✳ &nbsp; Every day is a chance
+        <strong>
+          to learn something new.
+        </strong>
+      </div>
+      <div class="float-card float-bottom">
+        ✦ &nbsp; Made for the curious
+        <strong>
+          Explore. Learn. Grow.
+        </strong>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">
+          THE OPPORTUNITIES
+        </div>
+        <h2 style="margin-top:9px">
+          Discover your next favorite course
+        </h2>
+        <p>
+          Thoughtfully designed learning experiences from dedicated educators.
+        </p>
+      </div>
+      <a class="text-action" routerLink="/courses">
+        View all courses →
+      </a>
+    </div>
+    @if(loading()) {
+    <div class="grid grid-3">
+      <div class="skeleton">
+      </div>
+      <div class="skeleton">
+      </div>
+      <div class="skeleton">
+      </div>
+    </div>
+    }
+    @else if(courses().length){
+    <div class="grid grid-3">
+      @for(course of courses();track course.id;let i=$index){
+      <app-course-card [course]="course" [index]="i" />
+      }
+    </div>
+    }
+    @else{
+    <div class="empty">
+      <div class="empty-illustration">
+        ✦
+      </div>
+      <h3>
+        Great things start here.
+      </h3>
+      <p>
+        No published courses yet. Check back when instructors publish their first courses.
+      </p>
+      <a class="btn btn-small" routerLink="/courses">
+        Explore catalog
+      </a>
+    </div>
+    }
+  </div>
+</section>
+<section class="section" style="background:#edf5ef">
+  <div class="container">
+    <div class="eyebrow">
+      WHY OPENLEARN
+    </div>
+    <h2 style="margin:10px 0 28px">
+      Learning that fits your life
+    </h2>
+    <div class="benefits">
+      <div class="benefit">
+        <div class="benefit-icon">
+          ◷
+        </div>
+        <h3>
+          Learn on your terms
+        </h3>
+        <p>
+          Access lessons and assignments when it works for your schedule. Learning shouldn't wait.
+        </p>
+      </div>
+      <div class="benefit">
+        <div class="benefit-icon">
+          ✎
+        </div>
+        <h3>
+          Guided by educators
+        </h3>
+        <p>
+          Learn from teachers who create courses, check your progress, and provide feedback.
+        </p>
+      </div>
+      <div class="benefit">
+        <div class="benefit-icon">
+          ✧
+        </div>
+        <h3>
+          Make it count
+        </h3>
+        <p>
+          Track your achievements and earn course certificates once all lessons are completed.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="cta-band">
+      <div>
+        <div class="eyebrow eyebrow-light">
+          LET'S BEGIN
+        </div>
+        <h2 style="margin:10px 0 8px">
+          Your next chapter begins with one click.
+        </h2>
+        <p>
+          Join OLP and find the course that's right for you.
+        </p>
+      </div>
+      <a class="btn btn-white" routerLink="/register">
+        Create an account ↗
+      </a>
+    </div>
+  </div>
+</section>

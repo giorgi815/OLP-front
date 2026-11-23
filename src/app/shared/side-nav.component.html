@@ -1,0 +1,35 @@
+<aside class="sidebar">
+  <div class="sidebar-group">
+    Workspace
+  </div>
+  <a routerLink="/dashboard" routerLinkActive="active">
+    ▦ &nbsp; Overview
+  </a>
+  @if(auth.isStudent()){
+  <a routerLink="/courses" routerLinkActive="active">
+    ◈ &nbsp; Find courses
+  </a>
+  }
+  @if(auth.isTeacher()){
+  <a routerLink="/teach" routerLinkActive="active">
+    ✎ &nbsp; Teaching studio
+  </a>
+  }
+  @if(auth.isAdmin()){
+  <a routerLink="/admin" routerLinkActive="active">
+    ⚙ &nbsp; Admin panel
+  </a>
+  }
+  <div class="sidebar-group">
+    Your account
+  </div>
+  <a routerLink="/notifications" routerLinkActive="active">
+    ♧ &nbsp; Notifications
+  </a>
+  <a routerLink="/profile" routerLinkActive="active">
+    ◯ &nbsp; My profile
+  </a>
+  <a routerLink="/courses">
+    ↗ &nbsp; Course catalog
+  </a>
+</aside>

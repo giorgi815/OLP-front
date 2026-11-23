@@ -1,0 +1,91 @@
+<div class="page-head">
+  <div class="container">
+    <div class="eyebrow">
+      STAY IN THE LOOP
+    </div>
+    <h1>
+      Your notifications
+    </h1>
+    <p>
+      Important updates from your learning community.
+    </p>
+  </div>
+</div>
+<div class="container dashboard-layout">
+  <app-side-nav/>
+  <div class="dashboard-main">
+    <div class="section-head">
+      <h2>
+        Inbox
+        <span class="badge-count">
+          {{items().length}}
+        </span>
+      </h2>
+      @if(items().length){
+      <button class="btn btn-outline btn-small" (click)="readAll()">
+        ✓ Mark all as read
+      </button>
+      }
+    </div>
+    @if(error()){
+    <div class="message error">
+      {{error()}}
+    </div>
+    }
+    @if(items().length){
+    <div class="list">
+      @for(item of items();track item.id){
+      <div class="list-row">
+        <div class="mini-art">
+          {{item.isRead?'✓':'♧'}}
+        </div>
+        <div class="grow">
+          <div class="button-row">
+            <strong>
+              {{item.title}}
+            </strong>
+            @if(!item.isRead){
+            <span class="pill">
+              New
+            </span>
+            }
+          </div>
+          <p style="line-height:1.7">
+            {{item.message}}
+          </p>
+          <p>
+            {{dateLabel(item.createdAt)}}
+          </p>
+        </div>
+        <div class="button-row">
+          @if(!item.isRead){
+          <button class="link-button" (click)="read(item.id)">
+            Mark read
+          </button>
+          }
+          <button class="link-button" style="color:#a24a48" (click)="remove(item.id)">
+            Delete
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+    }
+    @else{
+    <div class="empty">
+      <div class="empty-illustration">
+        ♧
+      </div>
+      <h3>
+        All caught up!
+      </h3>
+      <p>
+        No notifications yet. When something new arrives, you'll see it here.
+      </p>
+      <a class="btn btn-small" routerLink="/dashboard">
+        Back to dashboard →
+      </a>
+    </div>
+    }
+  </div>
+</div>

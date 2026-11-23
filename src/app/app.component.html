@@ -1,0 +1,126 @@
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" routerLink="/" aria-label="OLP home">
+      <span class="brand-mark">
+        o
+        <span>
+          ✳
+        </span>
+      </span>
+      <span>
+        open
+        <span class="brand-soft">
+          learn
+        </span>
+        <small>
+          OLP
+        </small>
+      </span>
+    </a>
+    <nav class="desktop-nav" aria-label="Main navigation">
+      <a routerLink="/courses" routerLinkActive="active">
+        Explore courses
+      </a>
+      @if(auth.isLoggedIn()) {
+      <a routerLink="/dashboard" routerLinkActive="active">
+        My dashboard
+      </a>
+      }
+      @if(auth.isTeacher()) {
+      <a routerLink="/teach" routerLinkActive="active">
+        Teaching studio
+      </a>
+      }
+      @if(auth.isAdmin()) {
+      <a routerLink="/admin" routerLinkActive="active">
+        Admin
+      </a>
+      }
+    </nav>
+    <div class="top-actions">
+      @if(auth.isLoggedIn()) {
+      <a class="icon-btn" routerLink="/notifications" title="Notifications" aria-label="Notifications">
+        ♧
+      </a>
+      <a class="profile-pill" routerLink="/profile">
+        <span class="avatar">
+          {{initials()}}
+        </span>
+        <span class="profile-name">
+          {{name()}}
+        </span>
+      </a>
+      } @else {
+      <a class="text-link" routerLink="/login">
+        Log in
+      </a>
+      <a class="btn btn-dark btn-small" routerLink="/register">
+        Get started
+        <span aria-hidden="true">
+          ↗
+        </span>
+      </a>
+      }
+      <button type="button" class="icon-btn mobile-menu" (click)="menuOpen.set(!menuOpen())" aria-label="Toggle navigation" [attr.aria-expanded]="menuOpen()">
+        ☰
+      </button>
+    </div>
+  </header>
+  @if(menuOpen()) {
+  <nav class="mobile-links" aria-label="Mobile navigation">
+    <a routerLink="/courses" (click)="menuOpen.set(false)">
+      Explore courses
+    </a>
+    @if(auth.isLoggedIn()) {
+    <a routerLink="/dashboard" (click)="menuOpen.set(false)">
+      Dashboard
+    </a>
+    }
+    @if(auth.isTeacher()) {
+    <a routerLink="/teach" (click)="menuOpen.set(false)">
+      Teaching studio
+    </a>
+    }
+    @if(auth.isAdmin()) {
+    <a routerLink="/admin" (click)="menuOpen.set(false)">
+      Admin
+    </a>
+    }
+    @if(auth.isLoggedIn()) {
+    <a routerLink="/profile" (click)="menuOpen.set(false)">
+      Profile
+    </a>
+    <button (click)="auth.logout();menuOpen.set(false)">
+      Log out
+    </button>
+    }
+  </nav>
+  }
+  <main id="main-content">
+    <router-outlet />
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="brand footer-brand">
+        <span class="brand-mark">
+          o
+          <span>
+            ✳
+          </span>
+        </span>
+        <span>
+          open
+          <span class="brand-soft">
+            learn
+          </span>
+        </span>
+      </div>
+      <span>
+        Learning is a journey. Make it yours.
+      </span>
+      <span>
+        © 2026 OLP · Crafted for curious minds
+      </span>
+    </div>
+  </footer>
+</div>

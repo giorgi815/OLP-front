@@ -1,0 +1,234 @@
+@if(course();as c){
+<div class="page-head">
+  <div class="container">
+    <a routerLink="/courses" class="back-link">
+      ← All courses
+    </a>
+    <div style="margin-top:23px">
+      <span class="tag">
+        {{c.categoryName || 'Learning'}}
+      </span>
+      <h1 style="margin:12px 0 0;max-width:820px">
+        {{c.title}}
+      </h1>
+      <div class="course-meta">
+        <span>
+          ✎ {{c.teacherName||'Instructor'}}
+        </span>
+        <span>
+          ◷ {{c.duration}} minutes
+        </span>
+        <span>
+          ✦ {{c.status===2?'Published':'Draft'}}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+<section class="section">
+  <div class="container split">
+    <div>
+      <div class="course-banner art-{{artIndex}}">
+        <span aria-hidden="true">
+          {{artSymbols[artIndex]}}
+        </span>
+      </div>
+      <div class="panel panel-pad space-top">
+        <h3>
+          About this course
+        </h3>
+        <p class="content-copy">
+          {{c.description}}
+        </p>
+      </div>
+      <div class="panel panel-pad space-top">
+        <div class="section-head">
+          <h3>
+            What you'll learn
+          </h3>
+          <span class="muted small">
+            {{lessons().length}} lessons
+          </span>
+        </div>
+        @if(!auth.isLoggedIn()){
+        <div class="subtle">
+          Sign in and enroll to access course materials.
+        </div>
+        }
+        @else if(auth.isStudent()&&!enrolled()){
+        <div class="subtle">
+          Enroll in this course to see its full lessons and assignments.
+        </div>
+        }
+        @else if(lessons().length){
+        <div class="list">
+          @for(lesson of lessons();track lesson.id;let i=$index){
+          <div class="list-row">
+            <span class="mini-art" style="font-size:15px">
+              {{i+1}}
+            </span>
+            <div class="grow">
+              <strong>
+                {{lesson.title}}
+              </strong>
+              <p>
+                Lesson {{lesson.orderIndex}}
+              </p>
+            </div>
+            <span class="muted small">
+              ›
+            </span>
+          </div>
+          }
+        </div>
+        }
+        @else{
+        <p class="muted small">
+          No lessons have been added yet.
+        </p>
+        }
+      </div>
+      <div class="panel panel-pad space-top">
+        <h3>
+          Student feedback
+        </h3>
+        @if(reviews().length){
+        <div class="list space-top">
+          @for(review of reviews();track review.id){
+          <div style="border-bottom:1px solid #edf0ed;padding:0 0 12px">
+            <div class="button-row">
+              <strong style="font-size:13px">
+                {{review.studentName || 'Learner'}}
+              </strong>
+              <span class="tag tag-amber">
+                ★ {{review.rating}}/5
+              </span>
+            </div>
+            <p class="content-copy" style="font-size:12px">
+              {{review.comment || 'No comment'}}
+            </p>
+          </div>
+          }
+        </div>
+        }@else{
+        <p class="muted small space-top">
+          Be the first to leave a review.
+        </p>
+        }
+        @if(auth.isStudent()&&enrolled()){
+        <hr class="divider"/>
+        <h3>
+          Write a review
+        </h3>
+        <form (ngSubmit)="review()">
+          <div class="field space-top">
+            <label>
+              Rating
+            </label>
+            <select name="rating" [(ngModel)]="rating">
+              <option [ngValue]="5">
+                ★★★★★ · 5
+              </option>
+              <option [ngValue]="4">
+                ★★★★ · 4
+              </option>
+              <option [ngValue]="3">
+                ★★★ · 3
+              </option>
+              <option [ngValue]="2">
+                ★★ · 2
+              </option>
+              <option [ngValue]="1">
+                ★ · 1
+              </option>
+            </select>
+          </div>
+          <div class="field">
+            <label>
+              Your thoughts
+            </label>
+            <textarea name="comment" [(ngModel)]="comment" placeholder="What did you like about the course?">
+            </textarea>
+          </div>
+          <button class="btn btn-small" [disabled]="busy()">
+            Post review
+          </button>
+        </form>
+        }
+      </div>
+    </div>
+    <aside>
+      <div class="panel panel-pad" style="position:sticky;top:103px">
+        <span class="eyebrow">
+          COURSE ACCESS
+        </span>
+        <div class="course-price space-top">
+          {{money(c.price)}}
+        </div>
+        <p class="muted small">
+          Invest in your next chapter.
+        </p>
+        <hr class="divider"/>
+        <ul class="bullet">
+          <li>
+            {{c.duration}} minutes of learning
+          </li>
+          <li>
+            Teacher-guided lessons
+          </li>
+          <li>
+            Practice assignments
+          </li>
+          <li>
+            Certificate after completion
+          </li>
+        </ul>
+        @if(!auth.isLoggedIn()){
+        <a class="btn btn-full space-top" [routerLink]="['/login']" [queryParams]="{next:'/courses/'+c.id}">
+          Sign in to enroll →
+        </a>
+        }
+        @else if(auth.isStudent()&&enrolled()){
+        <a class="btn btn-full space-top" [routerLink]="['/learning',c.id]">
+          Continue learning →
+        </a>
+        }
+        @else if(auth.isStudent()){
+        <button class="btn btn-full space-top" (click)="enroll()" [disabled]="busy()">
+          {{busy()?'Please wait…':c.price>0?'Purchase & enroll →':'Enroll for free →'}}
+        </button>
+        <p class="small muted">
+          {{c.price>0?'Development-mode simulated checkout; no real payment is collected.':'Start learning at no cost.'}}
+        </p>
+        }
+        @else if(auth.isTeacher()&&auth.profile()?.id===c.teacherId){
+        <a class="btn btn-full space-top" [routerLink]="['/teach/courses',c.id]">
+          Manage this course →
+        </a>
+        }
+        @if(message()){
+        <div class="message" [class.error]="failed()" [class.success]="!failed()">
+          {{message()}}
+        </div>
+        }
+      </div>
+    </aside>
+  </div>
+</section>
+}
+@else if(error()){
+<div class="container section">
+  <div class="message error">
+    {{error()}}
+  </div>
+  <a routerLink="/courses" class="btn btn-small">
+    Back to courses
+  </a>
+</div>
+}
+@else{
+<div class="container section">
+  <div class="skeleton">
+  </div>
+</div>
+}

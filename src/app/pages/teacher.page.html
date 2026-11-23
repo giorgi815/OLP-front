@@ -1,0 +1,146 @@
+<div class="page-head">
+  <div class="container">
+    <div class="eyebrow">
+      FOR EDUCATORS
+    </div>
+    <h1>
+      Your teaching studio
+    </h1>
+    <p>
+      Share what you know. Build something inspiring.
+    </p>
+  </div>
+</div>
+<div class="container dashboard-layout">
+  <app-side-nav/>
+  <div class="dashboard-main">
+    <div class="section-head">
+      <div>
+        <h2>
+          Courses you teach
+        </h2>
+        <p>
+          Manage drafts and published courses in one place.
+        </p>
+      </div>
+      <button class="btn btn-small" (click)="showForm.set(!showForm())">
+        {{showForm()?'Close form':'＋ Create a course'}}
+      </button>
+    </div>
+    @if(message()){
+    <div class="message" [class.error]="failed()" [class.success]="!failed()">
+      {{message()}}
+    </div>
+    }
+    @if(showForm()){
+    <div class="panel panel-pad space-bottom">
+      <h3>
+        Create a new course
+      </h3>
+      <p class="muted small">
+        New courses start as drafts. Add lessons and assignments before publishing.
+      </p>
+      <form (ngSubmit)="create()" #form="ngForm" class="space-top">
+        <div class="field">
+          <label>
+            Course title
+          </label>
+          <input name="title" [(ngModel)]="draft.title" required minlength="3" placeholder="e.g. Introduction to C#"/>
+        </div>
+        <div class="field">
+          <label>
+            Description
+          </label>
+          <textarea name="description" [(ngModel)]="draft.description" required placeholder="What will students learn?">
+          </textarea>
+        </div>
+        <div class="field">
+          <label>
+            Category
+          </label>
+          <select name="categoryId" [(ngModel)]="draft.categoryId" required>
+            <option value="">
+              Select a category
+            </option>
+            @for(cat of categories();track cat.id){
+            <option [value]="cat.id">
+              {{cat.name}}
+            </option>
+            }
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>
+              Duration (minutes)
+            </label>
+            <input type="number" name="duration" [(ngModel)]="draft.duration" min="1" required/>
+          </div>
+          <div class="field">
+            <label>
+              Price ($ · 0 = free)
+            </label>
+            <input type="number" name="price" [(ngModel)]="draft.price" min="0" step="0.01" required/>
+          </div>
+        </div>
+        <button class="btn" type="submit" [disabled]="busy()||form.invalid">
+          {{busy()?'Creating…':'Create draft course →'}}
+        </button>
+      </form>
+    </div>
+    }
+    @if(courses().length){
+    <div class="grid grid-2">
+      @for(c of courses();track c.id){
+      <div class="panel panel-pad">
+        <div class="action-bar">
+          <span class="tag">
+            {{c.categoryName || 'Course'}}
+          </span>
+          <span [class]="c.status===2?'pill':'pill pending'">
+            {{c.status===2?'Published':'Draft'}}
+          </span>
+        </div>
+        <h3>
+          {{c.title}}
+        </h3>
+        <p class="muted small" style="line-height:1.75;min-height:43px">
+          {{c.description.slice(0,100)}}
+        </p>
+        <div class="course-meta">
+          <span>
+            ◷ {{c.duration}} min
+          </span>
+          <strong>
+            {{money(c.price)}}
+          </strong>
+        </div>
+        <a class="btn btn-small btn-full" [routerLink]="['/teach/courses',c.id]">
+          Manage course →
+        </a>
+      </div>
+      }
+    </div>
+    }
+    @else if(!loading()){
+    <div class="empty">
+      <div class="empty-illustration">
+        ✎
+      </div>
+      <h3>
+        Let's create your first course
+      </h3>
+      <p>
+        Great courses begin with a great idea. Write down yours and bring it to life.
+      </p>
+      <button class="btn btn-small" (click)="showForm.set(true)">
+        ＋ New course
+      </button>
+    </div>
+    }
+    @else{
+    <div class="skeleton">
+    </div>
+    }
+  </div>
+</div>

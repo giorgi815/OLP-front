@@ -1,0 +1,484 @@
+<div class="page-head">
+  <div class="container">
+    <a routerLink="/teach" class="back-link">
+      ← Teaching studio
+    </a>
+    <div class="eyebrow" style="margin-top:20px">
+      COURSE MANAGEMENT
+    </div>
+    <h1>
+      {{course()?.title||'Manage course'}}
+    </h1>
+    <p>
+      {{course()?.categoryName}} · {{course()?.duration}} minutes · {{money(course()?.price||0)}}
+    </p>
+  </div>
+</div>
+<div class="container section">
+  @if(message()){
+  <div class="message" [class.error]="failed()" [class.success]="!failed()" role="status">
+    {{message()}}
+  </div>
+  }
+  @if(course();as c){
+  <div class="panel panel-pad space-bottom">
+    <div class="action-bar">
+      <div>
+        <span [class]="c.status===2?'pill':'pill pending'">
+          {{c.status===2?'Published':'Draft'}}
+        </span>
+        <h3 style="margin-top:12px">
+          {{c.title}}
+        </h3>
+      </div>
+      <div class="button-row">
+        @if(c.status===2){
+        <a class="btn btn-outline btn-small" [routerLink]="['/courses',c.id]">
+          Preview ↗
+        </a>
+        }
+        <button class="btn btn-outline btn-small" (click)="editCourseOpen.set(!editCourseOpen())">
+          {{editCourseOpen()?'Close edit':'Edit course'}}
+        </button>
+        @if(c.status!==2){
+        <button class="btn btn-small" (click)="publish()" [disabled]="busy()">
+          Publish course ↗
+        </button>
+        }
+      </div>
+    </div>
+    <p class="muted small">
+      {{c.description}}
+    </p>
+    @if(editCourseOpen()){
+    <form (ngSubmit)="saveCourse()" #editForm="ngForm" style="margin-top:22px;padding-top:18px;border-top:1px solid #e3ebe7">
+      <h3 class="space-bottom">
+        Edit course details
+      </h3>
+      <div class="field">
+        <label>
+          Title
+        </label>
+        <input name="courseTitle" [(ngModel)]="courseDraft.title" required/>
+      </div>
+      <div class="field">
+        <label>
+          Description
+        </label>
+        <textarea name="courseDescription" [(ngModel)]="courseDraft.description" required>
+        </textarea>
+      </div>
+      <div class="field">
+        <label>
+          Category
+        </label>
+        <select name="categoryId" [(ngModel)]="courseDraft.categoryId" required>
+          @for(cat of categories();track cat.id){
+          <option [value]="cat.id">
+            {{cat.name}}
+          </option>
+          }
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>
+            Duration (minutes)
+          </label>
+          <input type="number" name="duration" [(ngModel)]="courseDraft.duration" min="1" required/>
+        </div>
+        <div class="field">
+          <label>
+            Price ($)
+          </label>
+          <input type="number" name="price" [(ngModel)]="courseDraft.price" min="0" step=".01" required/>
+        </div>
+      </div>
+      <button class="btn btn-small" [disabled]="busy()||editForm.invalid">
+        Save course changes
+      </button>
+    </form>
+    }
+  </div>
+  }
+  <div class="tabs" role="tablist">
+    <button class="tab" [class.active]="tab()==='lessons'" (click)="tab.set('lessons')">
+      Lessons
+      <span class="badge-count">
+        {{lessons().length}}
+      </span>
+    </button>
+    <button class="tab" [class.active]="tab()==='assignments'" (click)="tab.set('assignments')">
+      Assignments
+      <span class="badge-count">
+        {{assignments().length}}
+      </span>
+    </button>
+    <button class="tab" [class.active]="tab()==='students'" (click)="tab.set('students')">
+      Students & attendance
+      <span class="badge-count">
+        {{students().length}}
+      </span>
+    </button>
+    <button class="tab" [class.active]="tab()==='grades'" (click)="tab.set('grades')">
+      Grades
+    </button>
+  </div>
+  @if(tab()==='lessons'){
+  <div class="split">
+    <div>
+      <div class="section-head">
+        <h3>
+          Course lessons
+        </h3>
+      </div>
+      <div class="list">
+        @for(lesson of lessons();track lesson.id){
+        <div class="panel panel-pad">
+          <div class="action-bar">
+            <div>
+              <span class="tag">
+                Lesson {{lesson.orderIndex}}
+              </span>
+              <h3 style="margin-top:8px">
+                {{lesson.title}}
+              </h3>
+            </div>
+            <div class="button-row">
+              <button class="link-button" (click)="editLesson(lesson)">
+                Edit
+              </button>
+              <button class="link-button" style="color:#af4740" (click)="deleteLesson(lesson.id)">
+                Delete
+              </button>
+            </div>
+          </div>
+          <p class="content-copy">
+            {{lesson.content.slice(0,160)}}
+          </p>
+          <div class="field space-top">
+            <label>
+              Attach lesson file
+            </label>
+            <input type="file" (change)="uploadLesson(lesson.id,$event)" />
+          </div>
+          <div class="button-row">
+            @for(key of lesson.attachments;track key){
+            <span class="tag tag-neutral">
+              📎 {{key.split('/').pop()}}
+            </span>
+            }
+          </div>
+        </div>
+        }@empty{
+        <div class="empty">
+          <div class="empty-illustration">
+            ◈
+          </div>
+          <h3>
+            No lessons yet
+          </h3>
+          <p>
+            Add your first lesson using the form on the right.
+          </p>
+        </div>
+        }
+      </div>
+    </div>
+    <aside>
+      <div class="form-box">
+        <h3>
+          {{lessonEditId?'Edit lesson':'Create a lesson'}}
+        </h3>
+        <form (ngSubmit)="saveLesson()" #lessonForm="ngForm" class="space-top">
+          <div class="field">
+            <label>
+              Title
+            </label>
+            <input name="lessonTitle" [(ngModel)]="lessonDraft.title" required/>
+          </div>
+          <div class="field">
+            <label>
+              Content
+            </label>
+            <textarea name="lessonContent" [(ngModel)]="lessonDraft.content" required>
+            </textarea>
+          </div>
+          <div class="field">
+            <label>
+              Order
+            </label>
+            <input name="orderIndex" type="number" [(ngModel)]="lessonDraft.orderIndex" min="0" required/>
+          </div>
+          <button class="btn btn-full" [disabled]="busy()||lessonForm.invalid">
+            {{lessonEditId?'Save lesson':'Add lesson ＋'}}
+          </button>
+          @if(lessonEditId){
+          <button class="btn btn-outline btn-full space-top" type="button" (click)="resetLesson()">
+            Cancel edit
+          </button>
+          }
+        </form>
+      </div>
+    </aside>
+  </div>
+  }
+  @if(tab()==='assignments'){
+  <div class="split">
+    <div>
+      <div class="section-head">
+        <h3>
+          Assignments
+        </h3>
+      </div>
+      <div class="list">
+        @for(a of assignments();track a.id){
+        <div class="panel panel-pad">
+          <div class="action-bar">
+            <div>
+              <h3>
+                {{a.title}}
+              </h3>
+              <p class="muted small">
+                Due {{dateLabel(a.dueDate)}} · {{a.maxScore}} points
+              </p>
+            </div>
+            <div class="button-row">
+              <button class="link-button" (click)="editAssignment(a)">
+                Edit
+              </button>
+              <button class="link-button" style="color:#a34848" (click)="deleteAssignment(a.id)">
+                Delete
+              </button>
+            </div>
+          </div>
+          <p class="content-copy">
+            {{a.description}}
+          </p>
+          <button class="btn btn-outline btn-small" (click)="openSubmissions(a)">
+            View submissions →
+          </button>
+        </div>
+        }@empty{
+        <div class="empty">
+          <div class="empty-illustration">
+            ✎
+          </div>
+          <h3>
+            Ready for practice?
+          </h3>
+          <p>
+            Create an assignment to check what your students have learned.
+          </p>
+        </div>
+        }
+      </div>
+    </div>
+    <aside>
+      <div class="form-box">
+        <h3>
+          {{assignmentEditId?'Edit assignment':'New assignment'}}
+        </h3>
+        <form class="space-top" (ngSubmit)="saveAssignment()" #assignmentForm="ngForm">
+          <div class="field">
+            <label>
+              Title
+            </label>
+            <input name="assignmentTitle" [(ngModel)]="assignmentDraft.title" required/>
+          </div>
+          <div class="field">
+            <label>
+              Description
+            </label>
+            <textarea name="assignmentDescription" [(ngModel)]="assignmentDraft.description" required>
+            </textarea>
+          </div>
+          <div class="field">
+            <label>
+              Due date
+            </label>
+            <input name="dueDate" type="datetime-local" [(ngModel)]="dueDateLocal" required/>
+          </div>
+          <div class="field">
+            <label>
+              Maximum points
+            </label>
+            <input name="maxScore" type="number" [(ngModel)]="assignmentDraft.maxScore" min="1" required/>
+          </div>
+          <button class="btn btn-full" [disabled]="busy()||assignmentForm.invalid">
+            {{assignmentEditId?'Save assignment':'Create assignment ＋'}}
+          </button>
+          @if(assignmentEditId){
+          <button type="button" class="btn btn-outline btn-full space-top" (click)="resetAssignment()">
+            Cancel edit
+          </button>
+          }
+        </form>
+      </div>
+    </aside>
+  </div>
+  }
+  @if(tab()==='students'){
+  <div class="section-head">
+    <div>
+      <h3>
+        Enrolled students
+      </h3>
+      <p>
+        Your teacher account marks lessons completed for students. Students cannot mark themselves complete.
+      </p>
+    </div>
+  </div>
+  @if(students().length){
+  <div class="panel table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>
+            Student
+          </th>
+          <th>
+            Joined
+          </th>
+          <th>
+            Mark lesson complete
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @for(student of students();track student.id){
+        <tr>
+          <td>
+            <strong>
+              {{studentNames()[student.studentId]||'Student'}}
+            </strong>
+            <div class="small muted">
+              {{student.studentId}}
+            </div>
+          </td>
+          <td>
+            {{dateLabel(student.enrolledAt)}}
+          </td>
+          <td>
+            <div class="button-row">
+              <select class="search-input" style="max-width:220px" [value]="selectedLessonByStudent[student.studentId]||''" (change)="selectedLessonByStudent[student.studentId]=$any($event.target).value">
+                <option value="">
+                  Choose a lesson
+                </option>
+                @for(lesson of lessons();track lesson.id){
+                <option [value]="lesson.id">
+                  {{lesson.title}}
+                </option>
+                }
+              </select>
+              <button class="btn btn-small" [disabled]="!selectedLessonByStudent[student.studentId]||busy()" (click)="markStudent(student.studentId)">
+                Mark completed ✓
+              </button>
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  }
+  @else{
+  <div class="empty">
+    <div class="empty-illustration">
+      ♙
+    </div>
+    <h3>
+      No students enrolled yet
+    </h3>
+    <p>
+      When students enroll, you can view them here and track their lesson completion.
+    </p>
+  </div>
+  }
+  }
+  @if(tab()==='grades'){
+  <div class="section-head">
+    <div>
+      <h3>
+        Homework grading
+      </h3>
+      <p>
+        Choose an assignment, review each student's answer, then save their score and feedback.
+      </p>
+    </div>
+  </div>
+  <div class="field" style="max-width:440px">
+    <label>
+      Assignment
+    </label>
+    <select [ngModel]="selectedAssignmentId()" (ngModelChange)="pickAssignment($event)" name="selectedAssignment">
+      <option value="">
+        Choose assignment
+      </option>
+      @for(a of assignments();track a.id){
+      <option [value]="a.id">
+        {{a.title}}
+      </option>
+      }
+    </select>
+  </div>
+  @if(selectedAssignmentId()){
+  <div class="list">
+    @for(s of gradingSubmissions();track s.id){
+    <div class="panel panel-pad">
+      <div class="action-bar">
+        <div>
+          <h3>
+            {{studentNames()[s.studentId]||'Student submission'}}
+          </h3>
+          <p class="muted small">
+            Submitted {{dateLabel(s.submittedAt)}}
+          </p>
+        </div>
+        <span [class]="s.score===null?'pill pending':'pill'">
+          {{s.score===null?'Not graded':'Score: '+s.score}}
+        </span>
+      </div>
+      <div class="subtle">
+        <div class="content-copy">
+          {{s.content}}
+        </div>
+        @for(key of s.attachments;track key){
+        <button class="link-button" (click)="downloadSubmission(s.id,key)">
+          ↓ {{key.split('/').pop()}}
+        </button>
+        }
+      </div>
+      <form class="space-top inline-form" (ngSubmit)="grade(s.id)">
+        <div class="field">
+          <label>
+            Score
+          </label>
+          <input type="number" min="0" [max]="selectedAssignmentMax()" [name]="'score'+s.id" [(ngModel)]="gradeValues[s.id]" required/>
+        </div>
+        <div class="field" style="flex:2">
+          <label>
+            Feedback
+          </label>
+          <input [name]="'feedback'+s.id" [(ngModel)]="feedbackValues[s.id]" placeholder="Helpful feedback for the student" />
+        </div>
+        <button class="btn btn-small" [disabled]="busy()">
+          Save grade →
+        </button>
+      </form>
+    </div>
+    }@empty{
+    <div class="empty">
+      <h3>
+        No submissions yet
+      </h3>
+      <p>
+        Students' completed homework will appear here.
+      </p>
+    </div>
+    }
+  </div>
+  }
+  }
+</div>
+

@@ -1,0 +1,117 @@
+<div class="page-head">
+  <div class="container">
+    <div class="eyebrow">
+      YOUR ACCOUNT
+    </div>
+    <h1>
+      Profile & settings
+    </h1>
+    <p>
+      A place to keep your account details up to date.
+    </p>
+  </div>
+</div>
+<div class="container dashboard-layout">
+  <app-side-nav/>
+  <div class="dashboard-main">
+    @if(message()){
+    <div class="message" [class.error]="failed()" [class.success]="!failed()">
+      {{message()}}
+    </div>
+    }
+    <div class="panel panel-pad space-bottom">
+      <div class="action-bar">
+        <div>
+          <h3>
+            Personal information
+          </h3>
+          <p class="muted small">
+            How you'd like to appear across OLP.
+          </p>
+        </div>
+        <span class="tag">
+          {{auth.roles().join(', ')}}
+        </span>
+      </div>
+      <form (ngSubmit)="save()" #form="ngForm">
+        <div class="form-row">
+          <div class="field">
+            <label>
+              First name
+            </label>
+            <input name="firstName" [(ngModel)]="firstName" required />
+          </div>
+          <div class="field">
+            <label>
+              Last name
+            </label>
+            <input name="lastName" [(ngModel)]="lastName" required />
+          </div>
+        </div>
+        <div class="field">
+          <label>
+            Email address
+          </label>
+          <input [value]="auth.session()?.email||''" readonly disabled/>
+          <small>
+            For email changes, contact an administrator.
+          </small>
+        </div>
+        <button class="btn btn-small" [disabled]="busy()||form.invalid">
+          Save changes →
+        </button>
+      </form>
+      <hr class="divider"/>
+      <h3>
+        Profile photo
+      </h3>
+      <p class="muted small">
+        Upload a new avatar image.
+      </p>
+      <div class="field space-top">
+        <input type="file" accept="image/*" (change)="upload($event)" />
+      </div>
+    </div>
+    <div class="panel panel-pad space-bottom">
+      <h3>
+        Change password
+      </h3>
+      <form (ngSubmit)="changePassword()" #passwordForm="ngForm" class="space-top">
+        <div class="field">
+          <label>
+            Current password
+          </label>
+          <input type="password" name="current" [(ngModel)]="currentPassword" required/>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>
+              New password
+            </label>
+            <input type="password" name="new" [(ngModel)]="newPassword" required minlength="8"/>
+          </div>
+          <div class="field">
+            <label>
+              Confirm new password
+            </label>
+            <input type="password" name="confirm" [(ngModel)]="confirmNewPassword" required/>
+          </div>
+        </div>
+        <button class="btn btn-small" [disabled]="busy()||passwordForm.invalid">
+          Update password →
+        </button>
+      </form>
+    </div>
+    <div class="panel panel-pad">
+      <h3>
+        Sign out
+      </h3>
+      <p class="muted small">
+        You can safely end your current session at any time.
+      </p>
+      <button class="btn btn-outline btn-small" (click)="auth.logout()">
+        Log out →
+      </button>
+    </div>
+  </div>
+</div>

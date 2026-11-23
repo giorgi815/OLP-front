@@ -1,0 +1,258 @@
+<div class="page-head">
+  <div class="container">
+    <div class="eyebrow">
+      PLATFORM ADMINISTRATION
+    </div>
+    <h1>
+      Keep everything moving.
+    </h1>
+    <p>
+      Manage your platform with clarity and confidence.
+    </p>
+  </div>
+</div>
+<div class="container dashboard-layout">
+  <app-side-nav/>
+  <div class="dashboard-main">
+    @if(message()){
+    <div class="message" [class.error]="failed()" [class.success]="!failed()">
+      {{message()}}
+    </div>
+    }
+    <div class="grid grid-4 space-bottom">
+      <div class="stat-card">
+        <div class="stat-icon">
+          ♙
+        </div>
+        <strong>
+          {{statistics()?.users??'—'}}
+        </strong>
+        <span>
+          Users
+        </span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          ▤
+        </div>
+        <strong>
+          {{statistics()?.courses??'—'}}
+        </strong>
+        <span>
+          Courses
+        </span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          ◈
+        </div>
+        <strong>
+          {{statistics()?.enrollments??'—'}}
+        </strong>
+        <span>
+          Enrollments
+        </span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          ✎
+        </div>
+        <strong>
+          {{statistics()?.submissions??'—'}}
+        </strong>
+        <span>
+          Submissions
+        </span>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab" [class.active]="tab()==='categories'" (click)="tab.set('categories')">
+        Course categories
+      </button>
+      <button class="tab" [class.active]="tab()==='users'" (click)="tab.set('users')">
+        Users
+      </button>
+      <button class="tab" [class.active]="tab()==='notifications'" (click)="tab.set('notifications')">
+        Send notification
+      </button>
+    </div>
+    @if(tab()==='categories'){
+    <div class="split">
+      <div>
+        <h3 class="space-bottom">
+          Categories
+        </h3>
+        @if(categories().length){
+        <div class="list">
+          @for(c of categories();track c.id){
+          <div class="list-row">
+            <div class="mini-art">
+              ◈
+            </div>
+            <div class="grow">
+              <strong>
+                {{c.name}}
+              </strong>
+              <p>
+                {{c.description}}
+              </p>
+            </div>
+            <button class="link-button" (click)="editCategory(c)">
+              Edit
+            </button>
+            <button class="link-button" style="color:#a34242" (click)="deleteCategory(c.id)">
+              Delete
+            </button>
+          </div>
+          }
+        </div>
+        }@else{
+        <div class="empty">
+          <h3>
+            No categories yet
+          </h3>
+          <p>
+            Create one to organize published courses.
+          </p>
+        </div>
+        }
+      </div>
+      <aside>
+        <div class="form-box">
+          <h3>
+            {{categoryEditId?'Edit category':'New category'}}
+          </h3>
+          <form (ngSubmit)="saveCategory()" #form="ngForm" class="space-top">
+            <div class="field">
+              <label>
+                Name
+              </label>
+              <input name="categoryName" [(ngModel)]="categoryName" required/>
+            </div>
+            <div class="field">
+              <label>
+                Description
+              </label>
+              <textarea name="categoryDescription" [(ngModel)]="categoryDescription">
+              </textarea>
+            </div>
+            <button class="btn btn-full" [disabled]="busy()||form.invalid">
+              {{categoryEditId?'Save changes':'Add category ＋'}}
+            </button>
+            @if(categoryEditId){
+            <button class="btn btn-outline btn-full space-top" type="button" (click)="clearCategory()">
+              Cancel edit
+            </button>
+            }
+          </form>
+        </div>
+      </aside>
+    </div>
+    }
+    @if(tab()==='users'){
+    <div class="section-head">
+      <div>
+        <h3>
+          Platform user profiles
+        </h3>
+        <p>
+          Public profile IDs are not Identity account IDs.
+        </p>
+      </div>
+    </div>
+    <div class="panel table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>
+              Name
+            </th>
+            <th>
+              Domain profile ID
+            </th>
+            <th>
+              Joined
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(user of users();track user.id){
+          <tr>
+            <td>
+              <strong>
+                {{user.firstName}} {{user.lastName}}
+              </strong>
+            </td>
+            <td>
+              <code>
+                {{user.id}}
+              </code>
+            </td>
+            <td>
+              {{user.createdAt?.slice(0,10)||'—'}}
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="form-box space-top">
+      <h3>
+        Grant teacher role
+      </h3>
+      <p class="muted small" style="line-height:1.7">
+        Use the
+        <strong>
+          AspNetUsers.Id
+        </strong>
+        (Identity account GUID), not the DomainUsers.Id shown above. This backend does not currently expose Identity IDs in its admin user list.
+      </p>
+      <form class="inline-form space-top" (ngSubmit)="promote()">
+        <div class="field">
+          <label>
+            Target Identity User ID
+          </label>
+          <input name="identityId" [(ngModel)]="identityId" required placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
+        </div>
+        <button class="btn btn-small" [disabled]="busy()">
+          Grant teacher role
+        </button>
+      </form>
+    </div>
+    }
+    @if(tab()==='notifications'){
+    <div class="form-box" style="max-width:650px">
+      <h3>
+        Send a notification
+      </h3>
+      <p class="muted small">
+        Only admins can send notifications through the current API. Recipient is a Domain User GUID.
+      </p>
+      <form class="space-top" (ngSubmit)="sendNotification()" #notifForm="ngForm">
+        <div class="field">
+          <label>
+            Recipient Domain User ID
+          </label>
+          <input name="recipient" [(ngModel)]="recipient" required/>
+        </div>
+        <div class="field">
+          <label>
+            Title
+          </label>
+          <input name="notificationTitle" [(ngModel)]="notificationTitle" required/>
+        </div>
+        <div class="field">
+          <label>
+            Message
+          </label>
+          <textarea name="notificationMessage" [(ngModel)]="notificationMessage" required>
+          </textarea>
+        </div>
+        <button class="btn" [disabled]="busy()||notifForm.invalid">
+          Send notification →
+        </button>
+      </form>
+    </div>
+    }
+  </div>
+</div>

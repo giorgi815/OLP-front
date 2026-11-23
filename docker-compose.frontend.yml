@@ -1,0 +1,13 @@
+# Copy this service into the EXISTING solution-level docker-compose.yml.
+# Or run with: docker compose -f docker-compose.yml -f docker-compose.override.yml -f olp-frontend/docker-compose.frontend.yml up -d --build
+services:
+  frontend:
+    build:
+      context: ./olp-frontend
+      dockerfile: Dockerfile
+    image: olp-frontend:local
+    depends_on:
+      - olp
+    ports:
+      - "4200:80"
+    restart: unless-stopped

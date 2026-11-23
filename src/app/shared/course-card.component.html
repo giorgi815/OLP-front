@@ -1,0 +1,26 @@
+<a class="course-card" [routerLink]="['/courses',course().id]">
+  <div class="course-art" [class]="'course-art art-'+(index()%5)">
+    <span class="art-symbol">
+      {{symbols[index()%symbols.length]}}
+    </span>
+  </div>
+  <div class="course-card-body">
+    <span class="tag">
+      {{course().categoryName || 'Learning'}}
+    </span>
+    <h3>
+      {{course().title}}
+    </h3>
+    <p>
+      {{course().description.length > 103 ? course().description.slice(0,103)+'…' : course().description}}
+    </p>
+    <div class="course-card-bottom">
+      <span>
+        ◷ {{course().duration}} min · {{course().teacherName || 'Instructor'}}
+      </span>
+      <strong>
+        {{money(course().price)}}
+      </strong>
+    </div>
+  </div>
+</a>
