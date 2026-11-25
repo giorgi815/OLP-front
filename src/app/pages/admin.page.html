@@ -226,14 +226,14 @@
         Send a notification
       </h3>
       <p class="muted small">
-        Only admins can send notifications. Enter the recipient's registered email address.
+        Only admins can send notifications through the current API. Recipient is a Domain User GUID.
       </p>
       <form class="space-top" (ngSubmit)="sendNotification()" #notifForm="ngForm">
         <div class="field">
           <label>
-            Recipient email address
+            Recipient Domain User ID
           </label>
-          <input type="email" name="recipient" [(ngModel)]="recipient" placeholder="student@example.com" autocomplete="email" required email/>
+          <input name="recipient" [(ngModel)]="recipient" required/>
         </div>
         <div class="field">
           <label>
