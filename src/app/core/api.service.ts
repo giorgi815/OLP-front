@@ -226,8 +226,8 @@ export class ApiService {
     deleteNotification(id: string) {
         return this.delete<void>(`/notifications/${id}`);
     }
-    sendNotification(userId: string, title: string, message: string) {
-        return this.post<NotificationItem>('/notifications', { userId, title, message });
+    sendNotification(email: string, title: string, message: string) {
+        return this.post<NotificationItem>('/notifications', { email: email.trim(), title, message });
     }
     user(id: string) {
         return this.get<UserProfile>(`/users/${id}`);
